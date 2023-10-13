@@ -14,7 +14,8 @@ import org.bukkit.plugin.PluginManager;
 import java.util.Objects;
 
 public class SignChangeEventHandler implements Listener {
-
+    public SignChangeEventHandler() {
+    }
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
@@ -26,7 +27,7 @@ public class SignChangeEventHandler implements Listener {
             double cost = Double.parseDouble(costString);
             String id = StorageObjectUtil.generateId();
 
-            if(event.getLine(2) != null){
+            if (event.getLine(2) != null) {
                 id = event.getLine(2);
             }
 
