@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -29,6 +30,8 @@ public class TravelHandler extends BukkitRunnable implements Listener {
         this.counter = totalTime;
         this.player = player;
         this.object = signObject;
+
+        plugin.getServer().getPluginManager().registerEvents(this,plugin);
 
 
         //tp

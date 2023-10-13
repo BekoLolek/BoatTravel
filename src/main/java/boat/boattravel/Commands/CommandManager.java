@@ -1,7 +1,9 @@
 package boat.boattravel.Commands;
 
 import boat.boattravel.Commands.SubCommands.Help;
+import boat.boattravel.Commands.SubCommands.MyRoutes;
 import boat.boattravel.Commands.SubCommands.Reload;
+import boat.boattravel.Commands.SubCommands.Routes;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -16,6 +18,13 @@ public class CommandManager implements TabExecutor {
 
     public ArrayList<SubCommand> getSubCommands() {
         return subCommands;
+    }
+
+    public CommandManager() {
+        subCommands.add(new Reload());
+        subCommands.add(new Help());
+        //subCommands.add(new Routes());
+        //subCommands.add(new MyRoutes());
     }
 
     @Override

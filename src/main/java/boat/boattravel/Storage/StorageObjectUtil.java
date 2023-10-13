@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class StorageObjectUtil {
 
@@ -27,7 +28,7 @@ public class StorageObjectUtil {
     }
 
     public static SignObject create(SignObject signObject) {
-        if(!tryLink(signObject)){
+        if (!tryLink(signObject)) {
             signs.add(signObject);
         }
 
@@ -39,7 +40,7 @@ public class StorageObjectUtil {
         return signObject;
     }
 
-    public static SignObject find(Location location){
+    public static SignObject find(Location location) {
         String returnable = "";
 
         for (SignObject route : routes) {
@@ -50,11 +51,11 @@ public class StorageObjectUtil {
         return null;
     }
 
-    public static boolean tryLink(SignObject object){
+    public static boolean tryLink(SignObject object) {
         String id = object.getId();
 
-        for(int i = 0; i < signs.size();i++){
-            if(signs.get(i).getId().equals(id)){
+        for (int i = 0; i < signs.size(); i++) {
+            if (signs.get(i).getId().equals(id)) {
                 routes.add(object);
                 routes.add(signs.get(i));
                 signs.remove(signs.get(i));
@@ -123,7 +124,29 @@ public class StorageObjectUtil {
     }
 
     public static String generateId() {
-        return null;
+
+        int id = new Random(123).nextInt(9000) + 1000;
+        String stringId = String.valueOf(id);
+
+        for (int i = 0; i < routes.size(); i++) {
+            if (routes.get(i).getId().equals(stringId)) {
+                id = new Random(123).nextInt(9000) + 1000;
+                stringId = String.valueOf(id);
+                i = 0;
+
+            }
+        }
+
+        for (int i = 0; i < signs.size(); i++) {
+            if (signs.get(i).getId().equals(stringId)) {
+                id = new Random(123).nextInt(9000) + 1000;
+                stringId = String.valueOf(id);
+                i = 0;
+
+            }
+        }
+
+        return stringId;
     }
 
 
