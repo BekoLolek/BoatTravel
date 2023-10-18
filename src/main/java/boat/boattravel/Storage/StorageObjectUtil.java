@@ -4,17 +4,16 @@ import boat.boattravel.BoatTravel;
 import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class StorageObjectUtil {
 
-    private static ArrayList<SignObject> signs = new ArrayList<>();
-    private static ArrayList<SignObject> routes = new ArrayList<>();
+    public static ArrayList<SignObject> signs = new ArrayList<>();
+    public static ArrayList<SignObject> routes = new ArrayList<>();
 
     public static ArrayList<SignObject> getSigns() {
         return signs;
@@ -25,6 +24,9 @@ public class StorageObjectUtil {
     }
 
     public static SignObject create(SignObject signObject) {
+
+        Bukkit.getLogger().info(signObject.toString());
+
         if (!tryLink(signObject)) {
             signs.add(signObject);
         }
@@ -100,9 +102,10 @@ public class StorageObjectUtil {
     }
 
 
-    public static void save() throws IOException {
+    public static void saveRoutes() throws IOException {
         Gson gson = new Gson();
-        File routesFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/routes.json");
+        File routesFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/paired.json");
+        routesFile.getParentFile().mkdir();
         routesFile.createNewFile();
         Writer writer = new FileWriter(routesFile, false);
         gson.toJson(routes, writer);
@@ -110,15 +113,21 @@ public class StorageObjectUtil {
         writer.close();
 
 
+    }
+    public static void save() throws IOException {
+        saveRoutes();
+        saveSigns();
+    }
+
+    public static void saveSigns() throws IOException {
         Gson gson2 = new Gson();
-        File signsFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/signs.json");
+        File signsFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/lonely.json");
+        signsFile.getParentFile().mkdir();
         signsFile.createNewFile();
         Writer writerSigns = new FileWriter(signsFile, false);
         gson2.toJson(signs, writerSigns);
         writerSigns.flush();
         writerSigns.close();
-
-
     }
 
     public static String generateId() {
@@ -140,6 +149,23 @@ public class StorageObjectUtil {
             }
         }
         return stringId;
+    }
+
+    public static void load() throws IOException {
+        Gson gson = new Gson();
+        File routesFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/paired.json");
+        if(routesFile.exists()){
+            Reader reader = new FileReader(routesFile);
+            SignObject[] signObjects = gson.fromJson(reader, SignObject[].class);
+            routes = new ArrayList<>(Arrays.asList(signObjects));
+        }
+
+        File signsFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/lonely.json");
+        if(signsFile.exists()){
+            Reader readerSigns = new FileReader(signsFile);
+            SignObject[] signObjectsSigns = gson.fromJson(readerSigns, SignObject[].class);
+            signs = new ArrayList<>(Arrays.asList(signObjectsSigns));
+        }
     }
 
 

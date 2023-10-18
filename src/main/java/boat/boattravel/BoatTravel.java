@@ -27,9 +27,9 @@ public final class BoatTravel extends JavaPlugin {
         plugin = this;
         saveDefaultConfig();
         try {
-            StorageObjectUtil.save();
+            StorageObjectUtil.load();
         } catch (IOException e) {
-            //oopsie
+            Bukkit.getLogger().info(e.getMessage());
         }
 
 

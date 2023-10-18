@@ -58,4 +58,5 @@ public class SignObject {
     public void setIncome(double income) {
         this.income = income;
     }
+
 }
