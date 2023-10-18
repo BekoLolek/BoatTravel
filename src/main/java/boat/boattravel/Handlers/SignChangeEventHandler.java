@@ -20,6 +20,10 @@ public class SignChangeEventHandler implements Listener {
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
+        Bukkit.getLogger().info("Owner: " + event.getPlayer());
+        Bukkit.getLogger().info("block: " + event.getBlock());
+        Bukkit.getLogger().info("" + event.getLine(1));
+
         if (Objects.equals(event.getLine(0), "[Transport]") && event.getLine(1) != null) {
             OfflinePlayer owner = event.getPlayer();
             Location location = event.getBlock().getLocation();
