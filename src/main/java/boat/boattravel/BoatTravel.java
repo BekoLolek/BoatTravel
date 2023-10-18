@@ -7,6 +7,7 @@ import boat.boattravel.Handlers.SignClickEventHandler;
 
 //commit 
 import boat.boattravel.Storage.StorageObjectUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,10 +32,12 @@ public final class BoatTravel extends JavaPlugin {
             //oopsie
         }
 
+
+
         getCommand("boat").setExecutor(new CommandManager());
 
-        getServer().getPluginManager().registerEvents(new SignChangeEventHandler(),this);
-        getServer().getPluginManager().registerEvents(new SignClickEventHandler(),this);
+        Bukkit.getPluginManager().registerEvents(new SignChangeEventHandler(),this);
+        Bukkit.getPluginManager().registerEvents(new SignClickEventHandler(),this);
 
 
     }
