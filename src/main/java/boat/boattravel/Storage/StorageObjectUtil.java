@@ -4,9 +4,6 @@ import boat.boattravel.BoatTravel;
 import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,7 +32,7 @@ public class StorageObjectUtil {
         try {
             save();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            //oops
         }
         return signObject;
     }
@@ -105,18 +102,19 @@ public class StorageObjectUtil {
 
     public static void save() throws IOException {
         Gson gson = new Gson();
-
-        File routes = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/routes.json");
-        routes.createNewFile();
-        Writer writer = new FileWriter(routes, false);
+        File routesFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/routes.json");
+        routesFile.createNewFile();
+        Writer writer = new FileWriter(routesFile, false);
         gson.toJson(routes, writer);
         writer.flush();
         writer.close();
 
-        File sings = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/signs.json");
-        routes.createNewFile();
-        Writer writerSigns = new FileWriter(sings, false);
-        gson.toJson(signs, writerSigns);
+
+        Gson gson2 = new Gson();
+        File signsFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/signs.json");
+        signsFile.createNewFile();
+        Writer writerSigns = new FileWriter(signsFile, false);
+        gson2.toJson(signs, writerSigns);
         writerSigns.flush();
         writerSigns.close();
 
@@ -124,28 +122,23 @@ public class StorageObjectUtil {
     }
 
     public static String generateId() {
-
-        int id = new Random(123).nextInt(9000) + 1000;
+        int id = new Random().nextInt(9000) + 1000;
+        Bukkit.getLogger().info("Generated id: " + id);
         String stringId = String.valueOf(id);
-
-        for (int i = 0; i < routes.size(); i++) {
-            if (routes.get(i).getId().equals(stringId)) {
+        ArrayList<SignObject> merged = new ArrayList<>();
+        merged.addAll(routes);
+        merged.addAll(signs);
+        for (int i = 0; i < merged.size(); i++) {
+            if(i == 0){
                 id = new Random(123).nextInt(9000) + 1000;
                 stringId = String.valueOf(id);
+            }
+            if (merged.get(i).getId().equals(stringId)) {
+
                 i = 0;
 
             }
         }
-
-        for (int i = 0; i < signs.size(); i++) {
-            if (signs.get(i).getId().equals(stringId)) {
-                id = new Random(123).nextInt(9000) + 1000;
-                stringId = String.valueOf(id);
-                i = 0;
-
-            }
-        }
-
         return stringId;
     }
 

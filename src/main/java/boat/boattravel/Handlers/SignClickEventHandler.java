@@ -14,26 +14,28 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class SignClickEventHandler implements Listener {
-    public SignClickEventHandler() {
-    }
+
 
     @EventHandler
     public void onInteract(PlayerInteractEvent Event) {
-        if (Event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+
+        if(Event.getClickedBlock() == null) return;
+        if (Event.getClickedBlock().getState() instanceof Sign) {
             Player player = Event.getPlayer();
-            Block block = Event.getClickedBlock();
-            if (block != null && block.getState() instanceof Sign) {
-                Sign sign = (Sign) block.getState();
-                String line1 = sign.getLine(0);
-                String line2 = sign.getLine(2);
-                Location loc = block.getLocation();
-                if (line1.equals("[Transport]")) {
-                    boolean success = TravelHandler.doTravel(player, loc);
-                    if (!success) {
-                        player.sendMessage("End destination does not exist, travel cancelled!");
-                    }
+            Sign sign = (Sign) Event.getClickedBlock().getState();
+            String line1 = sign.getLine(0);
+            String line2 = sign.getLine(2);
+            Location loc = sign.getLocation();
+            if (line1.equals("[Transport]")) {
+                boolean success = TravelHandler.doTravel(player, loc);
+                if (!success) {
+                    player.sendMessage("End destination does not exist, travel cancelled!");
                 }
             }
+        }
+        if (Event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+
+
         }
 
     }
