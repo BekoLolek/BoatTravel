@@ -17,7 +17,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import java.text.MessageFormat;
 
-public class TravelHandler extends BukkitRunnable implements Listener {
+public class TravelHandler implements Listener {
 
     private Plugin plugin;
     private double counter;
@@ -50,25 +50,15 @@ public class TravelHandler extends BukkitRunnable implements Listener {
         //invisibility
         player.addPotionEffect(PotionEffectType.INVISIBILITY.createEffect(100000,1));
 
+        int time = (int)Math.floor(totalTime);
+
+        TeleportTask task = new TeleportTask(player,time,signObject.getDestination().getLocation());
+        task.runTaskTimer(plugin,0L,20L);
+
 
     }
 
-    @Override
-    public void run() {
-        if(counter > 0){
-            if(counter % 10 == 0){
-                player.sendMessage(MessageFormat.format("You will arrive in {0} seconds!", Math.floor(counter)));
-            }
-            counter--;
-        }else{
-            Location destination = object.getDestination().getLocation();
 
-            player.teleport(destination);
-            player.removePotionEffect(PotionEffectType.INVISIBILITY);
-            player.sendMessage("You have arrived!");
-            this.cancel();
-        }
-    }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent event){
@@ -81,7 +71,8 @@ public class TravelHandler extends BukkitRunnable implements Listener {
 
 
     public static boolean doTravel(Player player, Location location){
-        SignObject signObject = StorageObjectUtil.find(location);
+        player.teleport(ConfigStorage.getLimbo());
+        SignObject signObject = StorageObjectUtil.findSignObjectByLocation(location);
         double totalTime = calculateTime(signObject);
         if(totalTime == -10){
             return false;
@@ -108,8 +99,9 @@ public class TravelHandler extends BukkitRunnable implements Listener {
             int totalDistance = distX + distY;
 
             double speed = Double.parseDouble(BoatTravel.getPlugin().getConfig().getString("speed"));
+            Bukkit.getLogger().info("speed: " + speed);
 
-            double totalTime = totalDistance*speed;
+            double totalTime = totalDistance/speed;
 
             if(speed == -1){
                 totalTime = 1;

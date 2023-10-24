@@ -1,10 +1,8 @@
 package boat.boattravel.Handlers;
 
-import boat.boattravel.BoatTravel;
 import boat.boattravel.Storage.SignObject;
 import boat.boattravel.Storage.StorageObjectUtil;
 import boat.boattravel.Storage.TravelHandler;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -15,30 +13,39 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class SignClickEventHandler implements Listener {
 
-
     @EventHandler
-    public void onInteract(PlayerInteractEvent Event) {
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            Block clickedBlock = event.getClickedBlock();
+            Player player = event.getPlayer();
 
-        if(Event.getClickedBlock() == null) return;
-        if (Event.getClickedBlock().getState() instanceof Sign) {
-            Player player = Event.getPlayer();
-            Sign sign = (Sign) Event.getClickedBlock().getState();
-            String line1 = sign.getLine(0);
-            String line2 = sign.getLine(2);
-            Location loc = sign.getLocation();
-            if (line1.equals("[Transport]")) {
-                boolean success = TravelHandler.doTravel(player, loc);
-                if (!success) {
-                    player.sendMessage("End destination does not exist, travel cancelled!");
+            // Check if the clicked block is a sign
+            if (clickedBlock != null && clickedBlock.getState() instanceof Sign) {
+                Sign sign = (Sign) clickedBlock.getState();
+
+                // Implement your logic for signs here
+                player.sendMessage("You clicked a sign!");
+
+                SignObject clickedSignObject = StorageObjectUtil.findSignObjectByLocation(clickedBlock.getLocation());
+
+                if(clickedSignObject == null){
+                    player.sendMessage("Error with sign creation!");
+                }else{
+                    if(clickedSignObject.getDestination() != null){
+                        player.sendMessage("Prepare for travel!");
+                        TravelHandler.doTravel(player,clickedBlock.getLocation());
+                    }
                 }
+
+
+
             }
         }
-        if (Event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-
-
-        }
-
     }
+
+
+
+
 
 
 }

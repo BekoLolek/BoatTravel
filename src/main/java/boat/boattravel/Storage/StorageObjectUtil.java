@@ -1,19 +1,26 @@
 package boat.boattravel.Storage;
 
 import boat.boattravel.BoatTravel;
+import boat.boattravel.Storage.SignObject;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class StorageObjectUtil {
 
-    public static ArrayList<SignObject> signs = new ArrayList<>();
-    public static ArrayList<SignObject> routes = new ArrayList<>();
+    private static final String DATA_FOLDER = BoatTravel.getPlugin().getDataFolder().getAbsolutePath();
+    private static final String PAIRED_JSON = "paired.json";
+    private static final String LONELY_JSON = "lonely.json";
+
+    private static ArrayList<SignObject> signs = new ArrayList<>();
+    private static ArrayList<SignObject> routes = new ArrayList<>();
 
     public static ArrayList<SignObject> getSigns() {
         return signs;
@@ -25,7 +32,6 @@ public class StorageObjectUtil {
 
     public static SignObject create(SignObject signObject) {
 
-        Bukkit.getLogger().info(signObject.toString());
 
         if (!tryLink(signObject)) {
             signs.add(signObject);
@@ -34,14 +40,13 @@ public class StorageObjectUtil {
         try {
             save();
         } catch (IOException e) {
-            //oops
+            // Handle the exception appropriately, e.g., log it
         }
+
         return signObject;
     }
 
     public static SignObject find(Location location) {
-        String returnable = "";
-
         for (SignObject route : routes) {
             if (route.getLocation().equals(location)) {
                 return route;
@@ -53,118 +58,132 @@ public class StorageObjectUtil {
     public static boolean tryLink(SignObject object) {
         String id = object.getId();
 
-        for (int i = 0; i < signs.size(); i++) {
-            if (signs.get(i).getId().equals(id)) {
+        // Find the sign with the matching ID in unlinked signs
+        SignObject matchingSign = findSignObjectById(id);
+
+        if (matchingSign != null) {
+            // Ensure that the matching sign is not already linked
+            if (matchingSign.getDestination() == null) {
+                // Set the destination of the matching sign to the provided object
+                matchingSign.setDestination(object);
+                // Set the destination of the provided object to the matching sign
+                object.setDestination(matchingSign);
+
                 routes.add(object);
-                routes.add(signs.get(i));
-                signs.remove(signs.get(i));
+                routes.add(matchingSign);
+                signs.remove(matchingSign);
                 return true;
             }
         }
+
         return false;
-
-    }
-
-    public static boolean removeSign(String id) {
-        signs.removeIf(o -> o.getId().equals(id));
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return true;
-    }
-
-    public static boolean removeRoutePartly(SignObject object) {
-        SignObject destination = object.getDestination();
-
-        for (int i = 0; i < routes.size(); i++) {
-            if (routes.get(i).equals(object)) {
-                routes.remove(object);
-                Bukkit.getLogger().info("Route origin removed successfully!");
-            }
-        }
-
-        for (int i = 0; i < routes.size(); i++) {
-            if (routes.get(i).equals(destination)) {
-                routes.remove(destination);
-                Bukkit.getLogger().info("Route destination removed successfully!");
-            }
-        }
-
-        signs.add(destination);
-        try {
-            save();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return true;
     }
 
 
-    public static void saveRoutes() throws IOException {
-        Gson gson = new Gson();
-        File routesFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/paired.json");
-        routesFile.getParentFile().mkdir();
-        routesFile.createNewFile();
-        Writer writer = new FileWriter(routesFile, false);
-        gson.toJson(routes, writer);
-        writer.flush();
-        writer.close();
-
-
-    }
     public static void save() throws IOException {
-        saveRoutes();
-        saveSigns();
-    }
-
-    public static void saveSigns() throws IOException {
-        Gson gson2 = new Gson();
-        File signsFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/lonely.json");
-        signsFile.getParentFile().mkdir();
-        signsFile.createNewFile();
-        Writer writerSigns = new FileWriter(signsFile, false);
-        gson2.toJson(signs, writerSigns);
-        writerSigns.flush();
-        writerSigns.close();
+        saveDataToFile(PAIRED_JSON, routes);
+        saveDataToFile(LONELY_JSON, signs);
     }
 
     public static String generateId() {
-        int id = new Random().nextInt(9000) + 1000;
-        Bukkit.getLogger().info("Generated id: " + id);
-        String stringId = String.valueOf(id);
-        ArrayList<SignObject> merged = new ArrayList<>();
-        merged.addAll(routes);
-        merged.addAll(signs);
-        for (int i = 0; i < merged.size(); i++) {
-            if(i == 0){
-                id = new Random(123).nextInt(9000) + 1000;
-                stringId = String.valueOf(id);
-            }
-            if (merged.get(i).getId().equals(stringId)) {
+        // Create a list to store all existing IDs
+        List<String> existingIds = new ArrayList<>();
 
-                i = 0;
+        // Add all IDs from signs and routes
+        for (SignObject sign : signs) {
+            existingIds.add(sign.getId());
+        }
+        for (SignObject route : routes) {
+            existingIds.add(route.getId());
+        }
 
+        Random random = new Random();
+
+        while (true) {
+            // Generate a 4-digit random integer
+            int id = random.nextInt(9000) + 1000;
+            String stringId = String.valueOf(id);
+
+            // Check if the generated ID is not in use
+            if (!existingIds.contains(stringId)) {
+                return stringId;
             }
         }
-        return stringId;
     }
 
+    public static SignObject findSignObjectById(String id) {
+        List<SignObject> merged = new ArrayList<>(signs);
+
+        for (SignObject signObject : merged) {
+            if (signObject.getId().equals(id)) {
+                return signObject;
+            }
+        }
+        return null; // SignObject not found
+    }
+
+    public static SignObject findSignObjectByLocation(Location location) {
+        List<SignObject> merged = new ArrayList<>(signs);
+        merged.addAll(routes);
+
+        for (SignObject signObject : merged) {
+            if (signObject.getLocation().equals(location)) {
+                return signObject;
+            }
+        }
+        return null; // SignObject not found
+    }
+
+
     public static void load() throws IOException {
-        Gson gson = new Gson();
-        File routesFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/paired.json");
-        if(routesFile.exists()){
-            Reader reader = new FileReader(routesFile);
-            SignObject[] signObjects = gson.fromJson(reader, SignObject[].class);
-            routes = new ArrayList<>(Arrays.asList(signObjects));
+        routes = loadDataFromFile(PAIRED_JSON);
+        signs = loadDataFromFile(LONELY_JSON);
+    }
+
+    private static void saveDataToFile(String fileName, List<SignObject> data) throws IOException {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(SignObject.class, new SignObjectTypeAdapter())
+                .create();
+        File file = new File(DATA_FOLDER + File.separator + fileName);
+        if (!file.exists()) {
+            // If the file doesn't exist, create it and write an empty JSON array.
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+
+            try (Writer writer = new FileWriter(file)) {
+                writer.write("[]"); // Write an empty JSON array.
+            }
+
         }
 
-        File signsFile = new File(BoatTravel.getPlugin().getDataFolder().getAbsolutePath() + "/lonely.json");
-        if(signsFile.exists()){
-            Reader readerSigns = new FileReader(signsFile);
-            SignObject[] signObjectsSigns = gson.fromJson(readerSigns, SignObject[].class);
-            signs = new ArrayList<>(Arrays.asList(signObjectsSigns));
+        try (Writer writer = new FileWriter(file, false)) {
+            gson.toJson(data, writer);
+            writer.flush();
+        } catch (IOException e) {
+            // Handle the exception appropriately, e.g., log it
+        }
+    }
+
+    private static ArrayList<SignObject> loadDataFromFile(String fileName) throws IOException {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(SignObject.class, new SignObjectTypeAdapter())
+                .create();
+        File file = new File(DATA_FOLDER + File.separator + fileName);
+
+        if (!file.exists()) {
+            // If the file doesn't exist, create it and write an empty JSON array.
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+
+            try (Writer writer = new FileWriter(file)) {
+                writer.write("[]"); // Write an empty JSON array.
+            }
+            return new ArrayList<>(); // Return an empty list, as there's no data to load.
+        }
+
+        try (Reader reader = new FileReader(file)) {
+            SignObject[] signObjects = gson.fromJson(reader, SignObject[].class);
+            return new ArrayList<>(Arrays.asList(signObjects));
         }
     }
 

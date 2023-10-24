@@ -1,5 +1,5 @@
-#speed of the travel (per block, default 0.2)
-speed: 0.2
+#speed of the travel (block per second, default 10)
+speed: 20
 
 #location in the limbo server/world
 limbo:
