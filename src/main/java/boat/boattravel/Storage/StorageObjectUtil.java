@@ -111,6 +111,30 @@ public class StorageObjectUtil {
         }
     }
 
+
+    public static void removeObjectById(String id){
+        List<SignObject> merged = new ArrayList<>(signs);
+        merged.addAll(routes);
+        SignObject signObj = null;
+        for (SignObject signObject : merged) {
+            if (signObject.getId().equals(id)) {
+                signObj = signObject;
+            }
+        }
+        try {
+            signs.remove(signObj);
+        }catch (Exception e){
+            //oops
+        }
+
+        try {
+            routes.remove(signObj);
+        }catch (Exception e){
+            //oops
+        }
+
+    }
+
     public static SignObject findSignObjectById(String id) {
         List<SignObject> merged = new ArrayList<>(signs);
 
