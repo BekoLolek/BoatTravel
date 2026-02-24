@@ -1,0 +1,44 @@
+name: BoatTravel
+version: '1'
+main: dev.bekololek.boattravel.Main
+api-version: "1.19"
+description: Ferry network with dock and travel signs
+authors: [Lolek]
+
+depend: [VersionAdapter]
+softdepend: [Vault, PlaceholderAPI]
+
+commands:
+  boattravel:
+    description: BoatTravel main command
+    usage: /boattravel <reload|cancel|docks|info|stats>
+    aliases: [bt]
+
+permissions:
+  boattravel.use:
+    description: Click a travel sign and begin a voyage
+    default: true
+  boattravel.dock:
+    description: Create a dock sign
+    default: op
+  boattravel.travel:
+    description: Create a travel sign
+    default: op
+  boattravel.cancel:
+    description: Use /boattravel cancel mid-voyage
+    default: true
+  boattravel.list:
+    description: Use /boattravel docks and /boattravel info
+    default: true
+  boattravel.admin:
+    description: Reload config and bypass travel cost
+    default: op
+  boattravel.bypass.cost:
+    description: Travel for free regardless of config cost
+    default: op
+  boattravel.stats:
+    description: View own travel statistics
+    default: true
+  boattravel.stats.others:
+    description: View other players' travel statistics
+    default: op

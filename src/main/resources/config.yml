@@ -1,0 +1,39 @@
+# BoatTravel Configuration
+# Plugin: BoatTravel.v1 - BL  |  Author: Lolek
+
+# How many times faster than walking speed a voyage travels.
+# Walking speed = 4.317 blocks/sec. At 10.0: ~43 blocks/sec.
+travel-speed-multiplier: 10.0
+
+# Economy cost per block of distance (requires Vault + economy plugin).
+# Set to 0.0 to disable per-block cost.
+cost-per-block: 0.0
+
+# Flat fee charged per voyage regardless of distance (requires Vault).
+# Set to 0.0 to disable flat cost.
+flat-cost: 0.0
+
+# Name of the dedicated water world used for voyages.
+# Created automatically on first server start if it does not exist.
+boat-world-name: "boattravel_world"
+
+# Spacing in blocks between concurrent boat instances (on the X axis).
+# At 256, up to ~16 concurrent voyages fit inside one render distance.
+boat-spacing: 256
+
+# Text color for dock sign header [BoatDock].
+# Valid values: BLACK, DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED,
+#               DARK_PURPLE, GOLD, GRAY, DARK_GRAY, BLUE, GREEN,
+#               AQUA, RED, LIGHT_PURPLE, YELLOW, WHITE
+sign-dock-color: "DARK_BLUE"
+
+# Text color for travel signs pointing to a valid destination dock.
+sign-valid-color: "DARK_GREEN"
+
+# Text color for travel signs pointing to a missing or removed dock.
+sign-invalid-color: "DARK_RED"
+
+# What to do when a player disconnects mid-voyage.
+# DESTINATION: teleport to the destination dock on next login (default)
+# ORIGIN:      teleport back to the origin dock on next login
+disconnect-behavior: "DESTINATION"

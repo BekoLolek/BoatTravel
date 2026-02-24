@@ -1,0 +1,11 @@
+plugin: "BoatTravel.v1 - BL"
+author: Lolek
+configs:
+  - path: config.yml
+    label: "Main Config"
+  - path: docks.yml
+    label: "Dock Registry"
+  - path: travel-signs.yml
+    label: "Travel Sign Registry"
+  - path: stats.yml
+    label: "Player Statistics"
